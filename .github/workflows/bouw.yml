@@ -246,9 +246,11 @@ jobs:
       # Korte schijfletter: Inno Setup kan niet met paden boven 260 tekens, en
       # onze werkmap (D:\a\aidg-documenten-brand\aidg-documenten-brand\) is
       # langer dan die van Euro-Office; sommige sjablonen hebben lange namen.
-      - name: Korte schijf X:
+      - name: Korte schijfletter (X)
         shell: pwsh
-        run: subst X: "${{ github.workspace }}"
+        run: |
+          subst X: "${{ github.workspace }}"
+          Get-ChildItem X:\ | Select-Object -First 5 Name
       - name: Bouwen en verpakken
         shell: pwsh
         working-directory: 'X:\'
