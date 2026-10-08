@@ -176,8 +176,10 @@ def splash_svg(b: float = 500, h: float = 250) -> str:
         '<rect width="500" height="250" fill="#fff"/>'
         '<rect x="0.5" y="0.5" width="499" height="249" fill="none" stroke="#ACACAC"/>'
         f'<image x="40" y="65" width="120" height="120" xlink:href="data:image/png;base64,{data}"/>'
-        '<text x="185" y="138" font-family="Segoe UI, Arial, Liberation Sans, DejaVu Sans, sans-serif" '
-        'font-size="34" fill="#1f2a33"><tspan font-weight="700">AIDG</tspan> Documenten</text>'
+        # textLength: past altijd, ook met een breder lettertype dan Segoe UI
+        '<text x="182" y="137" font-family="Segoe UI, Arial, Liberation Sans, DejaVu Sans, sans-serif" '
+        'font-size="32" fill="#1f2a33" textLength="290" lengthAdjust="spacingAndGlyphs">'
+        '<tspan font-weight="700">AIDG</tspan> Documenten</text>'
         '</svg>'
     )
 
