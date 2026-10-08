@@ -243,11 +243,18 @@ jobs:
         shell: pwsh
         run: choco install ninja -y --no-progress
       - uses: lukka/run-vcpkg@v11
+      # Korte schijfletter: Inno Setup kan niet met paden boven 260 tekens, en
+      # onze werkmap (D:\a\aidg-documenten-brand\aidg-documenten-brand\) is
+      # langer dan die van Euro-Office; sommige sjablonen hebben lange namen.
+      - name: Korte schijf X:
+        shell: pwsh
+        run: subst X: "${{ github.workspace }}"
       - name: Bouwen en verpakken
         shell: pwsh
+        working-directory: 'X:\'
         run: |
           .\build\windows\build.ps1 `
-            -CommonDir "${{ github.workspace }}\common" `
+            -CommonDir "X:\common" `
             -ProductVersion "${{ needs.versie.outputs.product_version }}" `
             -BuildNumber "${{ needs.versie.outputs.build_number }}" `
             -Arch x64 `
