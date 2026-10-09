@@ -243,20 +243,14 @@ jobs:
         shell: pwsh
         run: choco install ninja -y --no-progress
       - uses: lukka/run-vcpkg@v11
-      # Korte schijfletter: Inno Setup kan niet met paden boven 260 tekens, en
-      # onze werkmap (D:\a\aidg-documenten-brand\aidg-documenten-brand\) is
-      # langer dan die van Euro-Office; sommige sjablonen hebben lange namen.
-      - name: Korte schijfletter (X)
+      # Bouwen in de gewone werkmap (CMake wil geen bouwmap op de wortel van
+      # een schijf, en zo raakt sccache dezelfde paden als de vorige keer).
+      - name: Bouwen
         shell: pwsh
-        run: |
-          subst X: "${{ github.workspace }}"
-          Get-ChildItem X:\ | Select-Object -First 5 Name
-      - name: Bouwen en verpakken
-        shell: pwsh
-        working-directory: 'X:\'
         run: |
           .\build\windows\build.ps1 `
-            -CommonDir "X:\common" `
+            -SkipPackaging `
+            -CommonDir "${{ github.workspace }}\common" `
             -ProductVersion "${{ needs.versie.outputs.product_version }}" `
             -BuildNumber "${{ needs.versie.outputs.build_number }}" `
             -Arch x64 `
@@ -265,6 +259,30 @@ jobs:
             -Target standalone `
             -CompanyName "${{ env.COMPANY_NAME }}" `
             -ProductName "${{ env.PRODUCT_NAME }}"
+      # Verpakken vanaf een korte schijfletter: Inno Setup kan niet met paden
+      # boven 260 tekens, en onze werkmap is langer dan die van Euro-Office
+      # (sommige sjablonen hebben lange namen). Zelfde stappen als build.ps1.
+      - name: Verpakken
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          subst X: "${{ github.workspace }}"
+          Set-Location X:\desktop-apps\package
+          . X:\build\windows\packaging-helpers.ps1
+          $VersionFull = "${{ needs.versie.outputs.product_version }}.0"
+          Save-VcRedist (Get-Location).Path x64
+          .\make.ps1 -Version $VersionFull -Arch x64 -Target standalone `
+            -CompanyName "${{ env.COMPANY_NAME }}" -ProductName "${{ env.PRODUCT_NAME }}" `
+            -SourceDir X:\desktopeditors
+          Assert-LastExit "make.ps1"
+          $env:PATH = "C:\Program Files\7-Zip;$env:PATH"
+          .\make_zip.ps1 -Version $VersionFull -Arch x64 -Target standalone
+          Assert-LastExit "make_zip.ps1"
+          $env:INNOPATH = Get-InnoRoot "${env:ProgramFiles(x86)}\Inno Setup 6"
+          if (-not $env:INNOPATH) { throw 'Inno Setup niet gevonden' }
+          Sync-InnoLanguages (Join-Path $env:INNOPATH 'Languages')
+          .\make_inno.ps1 -Version $VersionFull -Arch x64 -Target standalone
+          Assert-LastExit "make_inno.ps1"
       - name: Wat er gemaakt is
         shell: pwsh
         run: Get-ChildItem desktop-apps\package -Recurse -Include *.exe,*.zip,*.msi | Select-Object FullName, Length
