@@ -271,6 +271,35 @@ REPARATIES = [
         # tijdens het werken met het document" bij elk document, werkbalk grijs.
         'achtergrond-pluginknop',
     ),
+    (
+        'web-apps/apps/api/documents/api.js',
+        """                _config.editorConfig.customization.compactHeader = false;
+            }
+        })();
+""",
+        """                _config.editorConfig.customization.compactHeader = false;
+            }
+        })();
+
+        // AIDG-BEGIN (AIDG Documenten op de pc): de AI-collega (paneel AIDG, rechts) opent vanzelf
+        // bij elk document, zoals online in AIDG Werkplek; geen Engelse tips over nieuwe functies
+        // (die vangen de eerste toetsaanslagen af) en geen feedbackknop naar de makers. Zie paneel/.
+        (function() {
+            if (!window.AscDesktopEditor) return;
+            var e = _config.editorConfig = _config.editorConfig || {};
+            e.plugins = e.plugins || {};
+            var a = e.plugins.autostart = e.plugins.autostart || [];
+            if (a.indexOf('asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}') < 0) a.push('asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}');
+            var c = e.customization = (typeof e.customization === 'object' && e.customization) || {};
+            c.feedback = false;
+            c.suggestFeature = false;
+            if (c.features === undefined) c.features = {};
+            if (c.features && typeof c.features === 'object') c.features.featuresTips = false;
+        })();
+        // AIDG-EIND
+""",
+        'ai-collega-autostart',
+    ),
 ]
 
 

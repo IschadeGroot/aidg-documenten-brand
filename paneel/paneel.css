@@ -1,0 +1,97 @@
+/* AI-collega in AIDG Documenten. Merkkleur #153041 met de oranje accentlijn van AIDG; licht en donker. */
+:root {
+  --merk: #153041;
+  --accent: #f08a00;
+  --tekst: #1f2933;
+  --zacht: #5b6670;
+  --rand: #d9dee3;
+  --vlak: #ffffff;
+  --vlak2: #f3f5f7;
+  --wij: #e8eef3;
+  --goed: #1e8e3e;
+  --fout: #c5221f;
+  --bezig: #e3a008;
+}
+body.donker {
+  --tekst: #e6e9ec;
+  --zacht: #a7b0b8;
+  --rand: #3a4148;
+  --vlak: #2a2f34;
+  --vlak2: #33393f;
+  --wij: #34404a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font: 13px/1.45 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--tekst);
+  background: var(--vlak);
+  display: flex;
+  flex-direction: column;
+}
+.kop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 3px solid var(--accent);
+}
+.logo { width: 24px; height: 24px; border-radius: 50%; }
+.kop-tekst { flex: 1; min-width: 0; }
+.kop-titel { font-weight: 700; font-size: 14px; }
+.kop-sub { color: var(--zacht); font-size: 11px; }
+.kop-knop {
+  appearance: none; border: 0; background: none; color: var(--zacht);
+  font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 6px; border-radius: 4px;
+}
+.kop-knop:hover { background: var(--vlak2); color: var(--tekst); }
+.status { display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 11px; color: var(--zacht); }
+.stip { width: 8px; height: 8px; border-radius: 50%; background: var(--zacht); flex: none; }
+.stip.goed { background: var(--goed); }
+.stip.fout { background: var(--fout); }
+.stip.bezig { background: var(--bezig); }
+.melding {
+  border: 1px solid var(--rand); background: var(--vlak2); border-radius: 8px;
+  padding: 10px; margin: 4px 12px 8px;
+}
+.melding p { margin: 0 0 8px; }
+.knoppen { display: flex; flex-wrap: wrap; gap: 6px; }
+.knop {
+  appearance: none; border: 1px solid var(--merk); background: var(--merk); color: #fff;
+  border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; text-decoration: none;
+}
+.knop.tweede { background: transparent; color: var(--tekst); border-color: var(--rand); }
+.gesprek { flex: 1; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
+.welkom { margin: auto 0; text-align: center; color: var(--zacht); }
+.welkom-logo { width: 40px; height: 40px; border-radius: 50%; }
+.welkom-titel { font-size: 16px; font-weight: 700; color: var(--tekst); margin: 8px 0 4px; }
+.voorbeelden { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.voorbeeld {
+  appearance: none; border: 1px solid var(--rand); background: var(--vlak); color: var(--tekst);
+  border-radius: 8px; padding: 7px 10px; font: inherit; text-align: left; cursor: pointer;
+}
+.voorbeeld:hover { background: var(--vlak2); }
+.bericht { white-space: pre-wrap; word-break: break-word; border-radius: 10px; padding: 8px 10px; max-width: 100%; }
+.bericht.wij { align-self: flex-end; background: var(--wij); max-width: 88%; }
+.bericht.ai { align-self: stretch; background: transparent; padding-left: 0; padding-right: 0; }
+.bericht.ai.bezig::after { content: ' …'; color: var(--zacht); }
+.bericht.ai { white-space: normal; }
+.bericht ul { margin: 4px 0; padding-left: 18px; }
+.bericht code { background: var(--vlak2); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+.laatst { font-size: 11px; color: var(--zacht); margin: 0; padding: 4px 12px; }
+.invoer {
+  display: flex; gap: 6px; align-items: flex-end; margin: 6px 10px 4px; padding: 6px;
+  border: 1px solid var(--rand); border-radius: 12px; background: var(--vlak);
+}
+.invoer textarea {
+  flex: 1; resize: none; border: 0; outline: none; background: transparent; color: var(--tekst);
+  font: inherit; max-height: 140px; min-height: 36px;
+}
+.stuur {
+  appearance: none; border: 0; border-radius: 50%; width: 30px; height: 30px; flex: none;
+  background: var(--merk); color: #fff; font-size: 16px; cursor: pointer;
+}
+.stuur:disabled { background: var(--rand); cursor: default; }
+.voet { display: flex; justify-content: flex-end; padding: 4px 12px 8px; font-size: 11px; }
+.link { appearance: none; border: 0; background: none; color: var(--zacht); font: inherit; cursor: pointer; text-decoration: underline; padding: 0; }
+.klein { font-size: 12px; }

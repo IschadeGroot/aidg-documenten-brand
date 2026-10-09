@@ -1,0 +1,51 @@
+<!doctype html>
+<!--
+  AI-collega in AIDG Documenten: het paneel AIDG rechts in de editor. De chat hier is de chat van de
+  AIDG-app op deze pc (elk gesprek staat ook in de app); de AI leest en schrijft in dit document met
+  opdrachten.js (dezelfde opdrachten als online in AIDG Werkplek). Zie paneel.js.
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIDG</title>
+<link rel="stylesheet" href="paneel.css">
+<script src="plugin-basis.js"></script>
+<script src="opdrachten.js"></script>
+<script src="paneel.js" defer></script>
+</head>
+<body>
+<header class="kop">
+  <img class="logo" src="resources/icoon-40.png" alt="">
+  <div class="kop-tekst">
+    <div class="kop-titel">AI-collega</div>
+    <div class="kop-sub">De AIDG-chat, in dit document</div>
+  </div>
+  <button id="nieuw" type="button" class="kop-knop" title="Nieuw gesprek" hidden>+</button>
+</header>
+<div class="status" role="status" aria-live="polite">
+  <span id="stip" class="stip"></span>
+  <span id="status">Even geduld…</span>
+</div>
+<div id="melding" class="melding" hidden>
+  <p id="melding-tekst"></p>
+  <div id="melding-knoppen" class="knoppen"></div>
+</div>
+<main id="gesprek" class="gesprek">
+  <section id="welkom" class="welkom">
+    <img src="resources/icoon-40.png" alt="" class="welkom-logo">
+    <p class="welkom-titel">Waar kan ik je mee helpen?</p>
+    <p class="klein">Vraag het hier; de AI werkt in <b id="docnaam">dit document</b>. Het gesprek staat ook in de AIDG-app.</p>
+    <div id="voorbeelden" class="voorbeelden"></div>
+  </section>
+</main>
+<p id="laatst" class="laatst" hidden></p>
+<form id="invoer" class="invoer" autocomplete="off">
+  <textarea id="vraag" rows="2" placeholder="Vraag over dit document" disabled></textarea>
+  <button id="stuur" type="submit" class="stuur" title="Versturen" disabled>&#x2191;</button>
+</form>
+<footer class="voet">
+  <button id="in-app" type="button" class="link">Open in de AIDG-app</button>
+</footer>
+</body>
+</html>

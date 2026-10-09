@@ -1,0 +1,23 @@
+{
+  "name": "AIDG",
+  "nameLocale": { "nl": "AIDG", "en": "AIDG" },
+  "guid": "asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}",
+  "version": "1.0.0",
+  "minVersion": "9.2.0",
+  "variations": [
+    {
+      "description": "AI-collega: de chat van de AIDG-app in dit document; de AI leest en schrijft live mee.",
+      "descriptionLocale": { "nl": "AI-collega: de chat van de AIDG-app in dit document; de AI leest en schrijft live mee." },
+      "url": "index.html",
+      "icons": ["resources/icoon-20.png", "resources/icoon-40.png"],
+      "isViewer": false,
+      "EditorsSupport": ["word", "cell", "slide"],
+      "type": "panelRight",
+      "initDataType": "none",
+      "initData": "",
+      "isUpdateOleOnResize": false,
+      "buttons": [],
+      "size": [340, 400]
+    }
+  ]
+}

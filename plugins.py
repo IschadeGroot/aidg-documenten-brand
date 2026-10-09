@@ -71,6 +71,13 @@ def main() -> int:
                 tekst = tekst[:i] + '<script type="text/javascript" src="aidg-koppeling.js"></script>\n    ' + tekst[i:]
                 html.write_text(tekst, 'utf-8')
         print(f'plugin {naam} -> {guid}' + (' (met AIDG-koppeling)' if naam in KOPPEL else ''))
+
+    # De AI-collega: ons eigen paneel AIDG (paneel/), rechts in de editor; de chat van de AIDG-app.
+    paneel = HIER / 'paneel'
+    cfg = json.loads((paneel / 'config.json').read_text('utf-8'))
+    guid = re.sub(r'^asc\.', '', cfg['guid'])
+    shutil.copytree(paneel, doelmap / guid, dirs_exist_ok=True)
+    print(f'paneel AIDG (AI-collega) -> {guid}')
     return 0
 
 
