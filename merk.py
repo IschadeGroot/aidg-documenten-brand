@@ -281,15 +281,14 @@ REPARATIES = [
             }
         })();
 
-        // AIDG-BEGIN (AIDG Documenten op de pc): de AI-collega (paneel AIDG, rechts) opent vanzelf
-        // bij elk document, zoals online in AIDG Werkplek; geen Engelse tips over nieuwe functies
-        // (die vangen de eerste toetsaanslagen af) en geen feedbackknop naar de makers. Zie paneel/.
+        // AIDG-BEGIN (AIDG Documenten op de pc): geen Engelse tips over nieuwe functies (die vangen
+        // de eerste toetsaanslagen af) en geen feedbackknop naar de makers, zoals online.
+        // NIET editorConfig.plugins zetten: in de desktop loopt loadPlugins dan op een ongezette
+        // 'me' stuk (gemeten 09-10-2026, "Cannot read properties of undefined (reading
+        // 'configPlugins')"). Het paneel AIDG start via Plugins.js (reparatie ai-collega-autostart).
         (function() {
             if (!window.AscDesktopEditor) return;
             var e = _config.editorConfig = _config.editorConfig || {};
-            e.plugins = e.plugins || {};
-            var a = e.plugins.autostart = e.plugins.autostart || [];
-            if (a.indexOf('asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}') < 0) a.push('asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}');
             var c = e.customization = (typeof e.customization === 'object' && e.customization) || {};
             c.feedback = false;
             c.suggestFeature = false;
@@ -298,6 +297,28 @@ REPARATIES = [
         })();
         // AIDG-EIND
 """,
+        'desktop-tips-uit',
+    ),
+    (
+        'web-apps/apps/common/main/lib/controller/Plugins.js',
+        """            if (me.appOptions.canPlugins) {
+                me.refreshPluginsList();
+                me.runAutoStartPlugins();
+            }""",
+        """            if (me.appOptions.canPlugins) {
+                me.refreshPluginsList();
+                // AIDG: de AI-collega (paneel AIDG, rechts) opent vanzelf bij elk document op de pc,
+                // zoals online in AIDG Werkplek (daar via de autostart van de Nextcloud-app).
+                var aidgPaneel = 'asc.{04B31F66-9E47-410B-9A25-DCA8184A7D70}';
+                if (window.AscDesktopEditor && !me.aidgPaneelGestart && collection.findWhere({guid: aidgPaneel})) {
+                    me.aidgPaneelGestart = true;
+                    me.autostart = (me.autostart || []).concat([aidgPaneel]);
+                }
+                // AIDG: zoals loadPlugins pas starten als alle scripts er zijn; anders bestaat
+                // Common.Views.PluginPanel (code.js) nog niet en loopt een paneel-plugin stuk.
+                me.startOnPostLoad = !Common.Controllers.LaunchController.isScriptLoaded();
+                !me.startOnPostLoad && me.runAutoStartPlugins();
+            }""",
         'ai-collega-autostart',
     ),
 ]
@@ -306,7 +327,8 @@ REPARATIES = [
 def reparaties(root: Path, uitmap: Path) -> int:
     n = 0
     for rel, fout, goed, naam in REPARATIES:
-        bron = root / rel
+        # Meer reparaties in hetzelfde bestand: verder op wat de vorige al schreef.
+        bron = uitmap / rel if (uitmap / rel).is_file() else root / rel
         if not bron.is_file():
             print(f'let op: reparatie {naam}: {rel} bestaat niet')
             continue
