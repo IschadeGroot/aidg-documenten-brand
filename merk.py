@@ -247,6 +247,55 @@ def programma_namen(root: Path, uitmap: Path) -> int:
     return n
 
 
+# Reparaties in de bron van Euro-Office die wij nodig hebben: (bestand, fout, goed, naam).
+# Staat de fout er niet meer in (Euro-Office loste het zelf op, of de code veranderde), dan
+# wordt er niets gewijzigd en meldt de build dat; nooit blind vervangen.
+REPARATIES = [
+    (
+        'web-apps/apps/common/main/lib/controller/Plugins.js',
+        """                });
+                _group.appendTo(me.$toolbarPanelPlugins);
+                if (me.backgroundPlugins.length > 0) {
+                    me.viewPlugins.backgroundBtn.show();""",
+        """                });
+                // AIDG: alleen achtergrond-plugins (zoals de AI) → de knop bestond nog niet.
+                if (me.backgroundPlugins.length > 0 && !isBackground) {
+                    _group = me.addBackgroundPluginsButton(_group);
+                    isBackground = true;
+                }
+                _group.appendTo(me.$toolbarPanelPlugins);
+                if (me.backgroundPlugins.length > 0) {
+                    me.viewPlugins.backgroundBtn.show();""",
+        # Gemeten 09-10-2026: met alleen de AI-plugin (een achtergrond-plugin) roept de editor
+        # backgroundBtn.show() aan op een knop die nooit gemaakt is → "Er is een fout ontstaan
+        # tijdens het werken met het document" bij elk document, werkbalk grijs.
+        'achtergrond-pluginknop',
+    ),
+]
+
+
+def reparaties(root: Path, uitmap: Path) -> int:
+    n = 0
+    for rel, fout, goed, naam in REPARATIES:
+        bron = root / rel
+        if not bron.is_file():
+            print(f'let op: reparatie {naam}: {rel} bestaat niet')
+            continue
+        tekst = bron.read_text('utf-8')
+        if goed in tekst:
+            print(f'reparatie {naam}: al aanwezig')
+            continue
+        if tekst.count(fout) != 1:
+            print(f'let op: reparatie {naam}: code veranderd, niet toegepast (zelf nakijken)')
+            continue
+        doel = uitmap / rel
+        doel.parent.mkdir(parents=True, exist_ok=True)
+        doel.write_text(tekst.replace(fout, goed), 'utf-8')
+        print(f'reparatie {naam}: toegepast')
+        n += 1
+    return n
+
+
 def doelen(root: Path) -> list[Path]:
     uit: list[Path] = []
     for rel in ZOEK_EO:
@@ -309,6 +358,7 @@ def main() -> int:
             overgeslagen += 1
     installer_namen(root, uitmap)
     programma_namen(root, uitmap)
+    reparaties(root, uitmap)
     print(f'{gedaan} bestanden in AIDG-huisstijl, {overgeslagen} overgeslagen')
     return 0 if gedaan else 1
 

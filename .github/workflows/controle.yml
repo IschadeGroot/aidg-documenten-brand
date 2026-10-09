@@ -1,5 +1,7 @@
-# Wekelijks: is er bij Euro-Office een nieuwere commit die bij hen zelf groen
-# bouwde? Dan die vastzetten in euro-office-ref.txt en AIDG Documenten bouwen.
+# Wekelijks: heeft Euro-Office een nieuwere RELEASE (tag vX.Y.Z of vX.Y.Z-N, geen rc)?
+# Dan die vastzetten in euro-office-ref.txt (en de nieuwste plugin-release in
+# plugins-ref.txt) en AIDG Documenten bouwen. Nooit main: een tussenstand van main
+# gaf 09-10-2026 een office die vastliep en ouder oogde dan online.
 # Zo volgen we hun updates zonder iets met de hand te doen; alleen de
 # AIDG-laag (deze repo) wordt erover gelegd.
 
@@ -27,15 +29,21 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          # Nieuwste release-tag van een repo als "<tag> <sha>" (geen rc, geen main).
+          nieuwste() {
+            gh api "repos/Euro-Office/$1/tags?per_page=100" --jq '.[] | "\(.name) \(.commit.sha)"' \
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)? ' | sort -V | tail -1
+          }
           HUIDIG="$(tr -d ' \r\n' < euro-office-ref.txt)"
-          # Nieuwste push op main waarvan de build bij Euro-Office slaagde.
-          NIEUW="$(gh api "repos/Euro-Office/DesktopEditors/actions/workflows/build.yml/runs?branch=main&event=push&status=success&per_page=1" --jq '.workflow_runs[0].head_sha')"
+          read -r TAG NIEUW <<< "$(nieuwste DesktopEditors)"
+          read -r PTAG PNIEUW <<< "$(nieuwste plugins)"
           echo "huidig: $HUIDIG"
-          echo "nieuwste groene: $NIEUW"
+          echo "nieuwste release: $TAG $NIEUW (plugins $PTAG $PNIEUW)"
           if [ -z "$NIEUW" ] || [ "$NIEUW" = "$HUIDIG" ]; then
             echo "nieuw=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
           echo "$NIEUW" > euro-office-ref.txt
+          if [ -n "$PNIEUW" ]; then echo "$PNIEUW" > plugins-ref.txt; fi
           git config user.name "aidg-bouw"
           git config user.email "aidg-bouw@users.noreply.github.com"
           git commit -qam "Euro-Office ${NIEUW:0:8}"
