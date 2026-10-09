@@ -26,6 +26,7 @@ from pathlib import Path
 HIER = Path(__file__).resolve().parent
 PLUGINS = ['ai']
 KOPPEL = {'ai'}  # plugins die het koppelscript krijgen
+KOPPEL_PAGINAS = ['index.html', 'chat.html', 'settings.html']
 
 
 def main() -> int:
@@ -56,9 +57,13 @@ def main() -> int:
                 html.write_text(nieuw, 'utf-8')
         if naam in KOPPEL:
             shutil.copyfile(HIER / 'koppeling' / 'aidg-koppeling.js', doel / 'aidg-koppeling.js')
-            html = doel / 'index.html'
-            tekst = html.read_text('utf-8')
-            if 'aidg-koppeling.js' not in tekst:
+            # index.html: de achtergrond (zet de aanbieder); chat.html en settings.html: de
+            # vensters waar "Inloggen met AIDG" verschijnt als er geen app en geen account is.
+            for pagina in KOPPEL_PAGINAS:
+                html = doel / pagina
+                tekst = html.read_text('utf-8')
+                if 'aidg-koppeling.js' in tekst:
+                    continue
                 i = tekst.find('<script')
                 if i < 0:
                     print(f'FOUT: geen <script> in {html}')
