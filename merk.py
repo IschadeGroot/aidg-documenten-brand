@@ -218,6 +218,35 @@ def installer_namen(root: Path, uitmap: Path) -> int:
     return n
 
 
+# Wat de gebruiker in het programma zelf ziet (titelbalk, taakbalk, meldingen).
+# Paden, register en mutex (APP_DATA_PATH, REG_*, APP_MUTEX_NAME) blijven
+# Euro-Office: daar hangen hun instellingen en updates aan.
+PROGRAMMA_NAMEN = {
+    'APP_TITLE': '"AIDG Documenten"',
+    'WINDOW_NAME': '"AIDG Documenten"',
+    'APP_SIMPLE_WINDOW_TITLE': '"AIDG Documenten"',
+}
+
+
+def programma_namen(root: Path, uitmap: Path) -> int:
+    bron = root / 'desktop-apps' / 'win-linux' / 'src' / 'defines.h'
+    if not bron.is_file():
+        print('let op: geen defines.h gevonden; programmanamen niet aangepast')
+        return 0
+    tekst = bron.read_text('utf-8')
+    n = 0
+    for naam, waarde in PROGRAMMA_NAMEN.items():
+        tekst, k = re.subn(rf'^(#define\s+{naam}\s+)"[^"]*"', lambda m: m.group(1) + waarde, tekst, flags=re.M)
+        n += k
+        if not k:
+            print(f'let op: {naam} niet in defines.h')
+    doel = uitmap / bron.relative_to(root)
+    doel.parent.mkdir(parents=True, exist_ok=True)
+    doel.write_text(tekst, 'utf-8')
+    print(f'programma: {n} namen naar AIDG Documenten')
+    return n
+
+
 def doelen(root: Path) -> list[Path]:
     uit: list[Path] = []
     for rel in ZOEK_EO:
@@ -279,6 +308,7 @@ def main() -> int:
             print(f'FOUT bij {rel}: {e}')
             overgeslagen += 1
     installer_namen(root, uitmap)
+    programma_namen(root, uitmap)
     print(f'{gedaan} bestanden in AIDG-huisstijl, {overgeslagen} overgeslagen')
     return 0 if gedaan else 1
 
